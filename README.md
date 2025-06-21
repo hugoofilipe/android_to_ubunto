@@ -10,6 +10,7 @@ With this project, you can easily connect your Android device to your Ubuntu sys
 - `adb` installed on your Ubuntu system.
 - `scrcpy` installed on your Ubuntu system.
 - `zenity` installed on your Ubuntu system.
+- `uxplay` installed on your Ubuntu system (for iPad mirroring).
 - Python 3 (recommended: 3.8+)
 - `pip` for Python 3
 - PyQt5 Python package
@@ -23,6 +24,8 @@ With this project, you can easily connect your Android device to your Ubuntu sys
    ```bash
    sudo apt update
    sudo apt install adb scrcpy zenity python3 python3-pip
+   # For iPad mirroring
+   sudo snap install uxplay
    ```
 
 2. **Clone the repository:**
@@ -126,7 +129,9 @@ If you want a standalone executable for the GUI:
    ```bash
    ./dist/android_to_ubunto
    ```
-2. Use the GUI window to start or stop the unlock script.
+2. Use the GUI window to:
+   - Start/stop the unlock script for your Android device.
+   - **Turn On/Off iPad**: This will run or kill the `uxplay -avdec -vs ximagesink` process for iPad mirroring.
 
 ---
 
@@ -158,7 +163,9 @@ android_to_ubunto/
   ```
 - The `.env` file must be present and contain your device password as `PWD=<your_password>`.
 - The GUI launches and terminates the unlock script as a subprocess.
+- The "Turn On/Off iPad" button in the GUI will start or kill the `uxplay` process for iPad mirroring.  
+  Make sure `uxplay` is installed and available in your PATH.
 
 ---
 
-**Enjoy controlling your Android device from Ubuntu!**
+**Enjoy controlling your Android and iPad devices from Ubuntu!**
