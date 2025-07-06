@@ -1,22 +1,35 @@
 #!/bin/bash
 
-# This script establishes a connection between an Android device and an Ubuntu system using ADB.
-# Usage: ./android_to_ubunto.sh [start|stop]
+# Usage: ./android_to_ubunto.sh [start|stop|wakeup]
+source "$(dirname "$0")/../.env"
 
 case "$1" in
     start)
         adb start-server
-        adb connect <device_ip_address>  # Replace <device_ip_address> with the actual device IP
-        scrcpy &
-        echo "ADB connection established and scrcpy started."
+        adb connect "$DEVICE_IP"
+        # Unlock sequence
+        adb shell "input keyevent 26"      # Power button (wake up)
+        sleep 0.5
+        adb shell "input keyevent 82"      # Unlock screen
+        adb shell input text "$PWD"        # Enter password
+        adb shell input keyevent 66        # Press Enter
+        /usr/local/bin/scrcpy -S --window-width=554 --window-height=1200 &
         ;;
     stop)
-        adb disconnect
+        adb shell "input keyevent 26"
         killall scrcpy
-        echo "ADB connection terminated and scrcpy closed."
+        pkill -f adb
+        echo "scrcpy closed and adb killed."
+        ;;
+    wakeup)
+        adb shell "input keyevent 26"
+        sleep 0.5
+        adb shell "input keyevent 82"
+        adb shell input text "$PWD"
+        adb shell input keyevent 66
         ;;
     *)
-        echo "Usage: $0 {start|stop}"
+        echo "Usage: $0 {start|stop|wakeup}"
         exit 1
         ;;
 esac
