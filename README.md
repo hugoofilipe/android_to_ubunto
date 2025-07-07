@@ -11,6 +11,7 @@ With this project, you can easily connect your Android device to your Ubuntu sys
 - `scrcpy` installed on your Ubuntu system.
 - `zenity` installed on your Ubuntu system.
 - `uxplay` installed on your Ubuntu system (for iPad mirroring).
+- `obs-studio` installed on your Ubuntu system (for OBS streaming).
 - Python 3 (recommended: 3.8+)
 - `pip` for Python 3
 - PyQt5 Python package
@@ -23,7 +24,7 @@ With this project, you can easily connect your Android device to your Ubuntu sys
 1. **Install system dependencies:**
    ```bash
    sudo apt update
-   sudo apt install adb scrcpy zenity python3 python3-pip
+   sudo apt install adb scrcpy zenity python3 python3-pip obs-studio
    # For iPad mirroring
    sudo snap install uxplay
    ```
@@ -38,9 +39,10 @@ With this project, you can easily connect your Android device to your Ubuntu sys
    ```bash
    touch .env
    ```
-   Add your device password to `.env`:
+   Add your device password and OBS config path to `.env`:
    ```bash
    PWD=<your_password>
+   OBSGLOBALINIPATH="/home/<username>/.config/obs-studio/global.ini"
    ```
 
 4. **Install Python dependencies:**
@@ -130,8 +132,10 @@ If you want a standalone executable for the GUI:
    ./dist/android_to_ubunto
    ```
 2. Use the GUI window to:
-   - Start/stop the unlock script for your Android device.
-   - **Turn On/Off iPad**: This will run or kill the `uxplay -avdec -vs ximagesink` process for iPad mirroring.
+   - **Start/Stop Unlock Script**: Connects to your Android device, unlocks it, and starts scrcpy mirroring.
+   - **Wakeup Phone**: Wakes up and unlocks your Android device when it goes to sleep (only available after starting the unlock script).
+   - **Turn On/Off iPad**: Starts or stops the `uxplay -avdec -vs ximagesink` process for iPad mirroring.
+   - **OBS Stream**: Removes the OBS global configuration file and starts OBS Studio with a clean setup for streaming.
 
 ---
 
@@ -155,17 +159,38 @@ android_to_ubunto/
 
 ---
 
-## Notes
+## Configuration
 
-- Make sure `adb_unlock.sh` is executable:  
-  ```bash
-  chmod +x adb_unlock.sh
-  ```
-- The `.env` file must be present and contain your device password as `PWD=<your_password>`.
-- The GUI launches and terminates the unlock script as a subprocess.
-- The "Turn On/Off iPad" button in the GUI will start or kill the `uxplay` process for iPad mirroring.  
-  Make sure `uxplay` is installed and available in your PATH.
+### .env File
+
+The `.env` file should contain the following variables:
+
+```bash
+# Android device unlock password
+PWD="your_device_password"
+
+# Path to OBS Studio global configuration file
+OBSGLOBALINIPATH="/home/username/.config/obs-studio/global.ini"
+
+# Optional: Android device IP (if using wireless ADB) -> never tested
+DEVICE_IP="192.168.1.100"
+```
 
 ---
 
-**Enjoy controlling your Android and iPad devices from Ubuntu!**
+## Notes
+
+- Make sure `adb_unlock.sh` and `android_to_ubunto.sh` are executable:  
+  ```bash
+  chmod +x adb_unlock.sh
+  chmod +x android_to_ubunto_gui/android_to_ubunto.sh
+  ```
+- The `.env` file must be present and contain your device password as `PWD=<your_password>`.
+- The GUI launches and terminates all processes as subprocesses.
+- The "Wakeup Phone" button is only enabled after starting the unlock script and disabled when stopping it.
+- The "OBS Stream" button removes the OBS global configuration file (specified in `OBSGLOBALINIPATH`) and starts OBS with a fresh setup.
+- Make sure `uxplay` and `obs-studio` are installed and available in your PATH.
+
+---
+
+**Enjoy controlling your Android and iPad devices from Ubuntu with integrated OBS streaming support!**

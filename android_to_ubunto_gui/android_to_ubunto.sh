@@ -13,7 +13,8 @@ case "$1" in
         adb shell "input keyevent 82"      # Unlock screen
         adb shell input text "$PWD"        # Enter password
         adb shell input keyevent 66        # Press Enter
-        /usr/local/bin/scrcpy -S --window-width=554 --window-height=1200 &
+        # /usr/local/bin/scrcpy -S --window-width=554 --window-height=1200 
+        /usr/local/bin/scrcpy -S  
         ;;
     stop)
         adb shell "input keyevent 26"

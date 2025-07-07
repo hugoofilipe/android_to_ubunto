@@ -1,28 +1,32 @@
 # gui.py
 
 import sys
+import os
 from PyQt5.QtWidgets import QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QMessageBox, QApplication
 import subprocess
-import os
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Android to Ubuntu Controller")
-        self.resize(500, 180)  # Increased window size (width, height)
+        self.resize(500, 200)  # Increased window size (width, height)
 
         self.status_label = QLabel("Status: Disconnected")
         self.unlock_button = QPushButton("Start Unlock phone")
         self.weakup_button = QPushButton("Wakeup Phone")
         self.ipad_button = QPushButton("Turn On Ipad")
+        self.obs_button = QPushButton("OBS Stream")
         self.close_button = QPushButton("Close")
+        
         self.ipad_on = False
         self.uxplay_process = None
         self.unlock_process = None
+        self.obs_process = None
 
         self.unlock_button.clicked.connect(self.toggle_unlock_script)
         self.ipad_button.clicked.connect(self.toggle_ipad)
         self.weakup_button.clicked.connect(self.wakeup_phone)
+        self.obs_button.clicked.connect(self.start_obs_stream)
         self.close_button.clicked.connect(self.close_program)
 
         layout = QVBoxLayout()
@@ -30,13 +34,14 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.unlock_button)
         layout.addWidget(self.weakup_button)
         layout.addWidget(self.ipad_button)
+        layout.addWidget(self.obs_button)
         layout.addWidget(self.close_button)
 
         container = QWidget()
         container.setLayout(layout)
         self.setCentralWidget(container)
 
-        self.weakup_button.setEnabled(False)  # Disable at start
+        self.weakup_button.setEnabled(False)
 
     def toggle_unlock_script(self):
         script_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../android_to_ubunto.sh'))
@@ -88,6 +93,37 @@ class MainWindow(QMainWindow):
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to wake up phone: {e}")
 
+    def start_obs_stream(self):
+        try:
+            # Load environment variables from .env file
+            env_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../.env'))
+            env_vars = {}
+            
+            if os.path.exists(env_path):
+                with open(env_path, 'r') as f:
+                    for line in f:
+                        line = line.strip()
+                        if line and not line.startswith('#') and '=' in line:
+                            key, value = line.split('=', 1)
+                            # Remove quotes if present
+                            value = value.strip('"\'')
+                            env_vars[key] = value
+            
+            obs_ini_path = env_vars.get('OBSGLOBALINIPATH', '~/.config/obs-studio/global.ini')
+            obs_ini_path = os.path.expanduser(obs_ini_path)
+            
+            # Remove the OBS config file
+            if os.path.exists(obs_ini_path):
+                os.remove(obs_ini_path)
+                print(f"Removed {obs_ini_path}")
+            
+            # Start OBS
+            self.obs_process = subprocess.Popen(['obs'])
+            self.status_label.setText("Status: OBS Stream Started")
+            
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to start OBS stream: {e}")
+
     def close_program(self):
         # Ensure all processes are terminated when closing the app via button
         script_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../android_to_ubunto.sh'))
@@ -100,6 +136,12 @@ class MainWindow(QMainWindow):
                 self.uxplay_process.wait(timeout=5)
             except Exception:
                 self.uxplay_process.kill()
+        if self.obs_process is not None:
+            self.obs_process.terminate()
+            try:
+                self.obs_process.wait(timeout=5)
+            except Exception:
+                self.obs_process.kill()
         # Kill all adb processes just in case
         subprocess.Popen(['pkill', '-f', 'adb'])
         QApplication.quit()
