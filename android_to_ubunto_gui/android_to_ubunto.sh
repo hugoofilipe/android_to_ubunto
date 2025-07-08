@@ -23,7 +23,9 @@ case "$1" in
         echo "scrcpy closed and adb killed."
         ;;
     wakeup)
-        adb shell "input keyevent 26"
+        adb shell "input keyevent 223"
+        sleep 0.5
+        adb shell "input keyevent 224"
         sleep 0.5
         adb shell "input keyevent 82"
         adb shell input text "$PWD"

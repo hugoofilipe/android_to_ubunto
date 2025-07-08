@@ -3,6 +3,8 @@
 This repository contains scripts and a GUI application to establish a connection between an Android device and an Ubuntu system using ADB (Android Debug Bridge).  
 With this project, you can easily connect your Android device to your Ubuntu system, execute commands, and view your device's screen.
 
+[Google doc](https://docs.google.com/document/d/1zsuAja7IZ38zojrrzAdW6rQsmZRLsS68q2z7z5VndNY/edit?tab=t.0).
+
 ---
 
 ## Requirements
@@ -136,6 +138,12 @@ If you want a standalone executable for the GUI:
    - **Wakeup Phone**: Wakes up and unlocks your Android device when it goes to sleep (only available after starting the unlock script).
    - **Turn On/Off iPad**: Starts or stops the `uxplay -avdec -vs ximagesink` process for iPad mirroring.
    - **OBS Stream**: Removes the OBS global configuration file and starts OBS Studio with a clean setup for streaming.
+   - **Battery Percentage**: Shows the current battery percentage of your Android device in the GUI.
+   - **Printing (basic)**: Extracts and displays all visible text from the current Android screen in the GUI (enabled only after unlocking).
+   - **Printing (deep)**: Scrolls through the screen multiple times, extracting and displaying all unique visible text found (enabled only after unlocking).
+   - **Use PIN**: Finds the "use pin" button on the Android screen and taps it, then enters your PIN automatically (enabled only after unlocking).
+
+   > **Note:** The "Printing (basic)", "Printing (deep)", and "Use PIN" buttons are only enabled after unlocking the device.
 
 ---
 
@@ -189,8 +197,10 @@ DEVICE_IP="192.168.1.100"
 - The GUI launches and terminates all processes as subprocesses.
 - The "Wakeup Phone" button is only enabled after starting the unlock script and disabled when stopping it.
 - The "OBS Stream" button removes the OBS global configuration file (specified in `OBSGLOBALINIPATH`) and starts OBS with a fresh setup.
+- The "Printing (basic)", "Printing (deep)", and "Use PIN" buttons are only enabled after unlocking the device.
 - Make sure `uxplay` and `obs-studio` are installed and available in your PATH.
+- The GUI shows your Android device's battery percentage.
 
 ---
 
-**Enjoy controlling your Android and iPad devices from Ubuntu with integrated OBS streaming support!**
+**Enjoy controlling your Android and iPad devices from Ubuntu with integrated OBS streaming and advanced automation!**
